@@ -2,9 +2,9 @@ import numpy as np
 from typing import List
 
 
-class Layer:
+class NeuronLayer:
     """
-    Class Layer. Represents a single layer of a neural network.
+    Class NeuronLayer. Represents a single layer of a neural network.
 
     Attributes:
     ----------
@@ -28,8 +28,8 @@ class Layer:
             Size of the output.
         """
 
-        self._weights = np.zeros((input_size, output_size))
-        self._bias = np.zeros((1, output_size))
+        self._weights = np.random.randn(input_size, output_size)
+        self._bias = np.random.randn(1, output_size)
 
         self._input = None
         self._output = None
@@ -65,9 +65,8 @@ class Layer:
             Output of the layer.
         """
 
-        self.input = input
-        self.output = np.dot(self.input, self.weights) + self.bias
-        self.output = self._sigmoid(self.output)
+        self._input = input
+        self._output = self._sigmoid(np.dot(self.input, self.weights) + self.bias)
 
         return self.output
 
@@ -90,10 +89,10 @@ class Layer:
 
         dE_dX = np.dot(dE_dY, self.weights.T)
         dE_dW = np.dot(self.input.T, dE_dY)
-        self.weights -= alfa * dE_dW
-        self.bias -= alfa * dE_dY
+        self._weights -= alfa * dE_dW
+        self._bias -= alfa * dE_dY
 
-        return self._dSigmoid(dE_dX) * dE_dY
+        return self._sigmoidDerivative(self.input) * dE_dX
 
     def _sigmoid(self, x: np.ndarray) -> np.ndarray:
         return 1 / (1 + np.exp(-x))
@@ -108,17 +107,17 @@ class NeuralNetwork:
 
     Attributes:
     ----------
-    layers : list[Layer]
+    layers : list[NeuronLayer]
         List of layers of the neural network.
     errors : list[float]
         List of the training errors.
     """
 
-    def __init__(self, layers: List[Layer]) -> None:
+    def __init__(self, layers: List[NeuronLayer]) -> None:
         """
         Parameters:
         ----------
-        layers : list[Layer]
+        layers : list[NeuronLayer]
             List of layers of the neural network.
         """
 
@@ -126,7 +125,7 @@ class NeuralNetwork:
         self._errors = None
 
     @property
-    def layers(self) -> List[Layer]:
+    def layers(self) -> List[NeuronLayer]:
         return self._layers
 
     @property
@@ -184,9 +183,9 @@ class NeuralNetwork:
         """
 
         n_samples = x.shape[0]
-        self.errors = np.zeros(n_epochs)
+        self._errors = np.zeros(n_epochs)
 
-        for _ in range(n_epochs):
+        for epoch in range(n_epochs):
             cost = 0
 
             for i in range(n_samples):
@@ -201,10 +200,10 @@ class NeuralNetwork:
                 for layer in reversed(self.layers):
                     dE_dY = layer.backwardPropagation(dE_dY, alfa)
 
-            self.errors[i] = cost / n_samples
+            self.errors[epoch] = cost / n_samples
 
-    def _cost(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        return np.mean((y_true - y_pred) ** 2)
+    def _cost(self, y: np.ndarray, prediction: np.ndarray) -> float:
+        return np.mean((y - prediction) ** 2)
 
-    def _costDerivative(self, y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
-        return 2 * (y_pred - y_true) / y_true.size
+    def _costDerivative(self, y: np.ndarray, prediction: np.ndarray) -> np.ndarray:
+        return 2 * (prediction - y) / y.size
