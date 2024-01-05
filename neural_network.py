@@ -19,6 +19,15 @@ class Layer:
     """
 
     def __init__(self, input_size: int, output_size: int) -> None:
+        """
+        Parameters:
+        ----------
+        input_size : int
+            Size of the input.
+        output_size : int
+            Size of the output.
+        """
+
         self._weights = np.zeros((input_size, output_size))
         self._bias = np.zeros((1, output_size))
 
@@ -41,13 +50,13 @@ class Layer:
     def output(self) -> np.ndarray:
         return self._output
 
-    def forwardPropagation(self, input_data: np.ndarray) -> np.ndarray:
+    def forwardPropagation(self, input: np.ndarray) -> np.ndarray:
         """
         Performs forward propagation of the layer.
 
         Parameters:
         ----------
-        input_data : numpy.ndarray
+        input : numpy.ndarray
             Input of the layer.
 
         Returns:
@@ -56,7 +65,7 @@ class Layer:
             Output of the layer.
         """
 
-        self.input = input_data
+        self.input = input
         self.output = np.dot(self.input, self.weights) + self.bias
         self.output = self._sigmoid(self.output)
 
@@ -106,6 +115,13 @@ class NeuralNetwork:
     """
 
     def __init__(self, layers: List[Layer]) -> None:
+        """
+        Parameters:
+        ----------
+        layers : list[Layer]
+            List of layers of the neural network.
+        """
+
         self._layers = layers
         self._errors = None
 
@@ -117,13 +133,13 @@ class NeuralNetwork:
     def errors(self) -> List[float]:
         return self._errors
 
-    def predict(self, input_data: np.ndarray) -> List[int]:
+    def predict(self, input: np.ndarray) -> List[int]:
         """
         Predicts the output for the given input data.
 
         Parameters:
         ----------
-        input_data : numpy.ndarray
+        input : numpy.ndarray
             Input data.
 
         Returns:
@@ -132,11 +148,11 @@ class NeuralNetwork:
             List of the predicted values.
         """
 
-        samples = input_data.shape[0]
+        samples = input.shape[0]
         result = []
 
         for i in range(samples):
-            output = input_data[i]
+            output = input[i]
 
             for layer in self.layers:
                 output = layer.forwardPropagation(output)
