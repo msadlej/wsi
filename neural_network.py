@@ -132,13 +132,13 @@ class NeuralNetwork:
     def errors(self) -> List[float]:
         return self._errors
 
-    def predict(self, input: np.ndarray) -> List[int]:
+    def predict(self, X: np.ndarray) -> List[int]:
         """
         Predicts the output for the given input data.
 
         Parameters:
         ----------
-        input : numpy.ndarray
+        X : numpy.ndarray
             Input data.
 
         Returns:
@@ -147,28 +147,28 @@ class NeuralNetwork:
             List of the predicted values.
         """
 
-        samples = input.shape[0]
+        samples = X.shape[0]
         result = []
 
         for i in range(samples):
-            output = input[i]
+            output = X[i]
 
             for layer in self.layers:
                 output = layer.forwardPropagation(output)
 
-            result.append(np.argmax(output) + 3)
+            result.append(np.argmax(output))
 
         return result
 
     def train(
-        self, x: np.ndarray, y: np.ndarray, n_epochs: int = 100, alfa=0.1
+        self, X: np.ndarray, y: np.ndarray, n_epochs: int = 100, alfa=0.1
     ) -> None:
         """
         Trains the neural network.
 
         Parameters:
         ----------
-        x : numpy.ndarray
+        X : numpy.ndarray
             Input data.
         y : numpy.ndarray
             Output data.
@@ -182,14 +182,14 @@ class NeuralNetwork:
         None
         """
 
-        n_samples = x.shape[0]
+        n_samples = X.shape[0]
         self._errors = np.zeros(n_epochs)
 
         for epoch in range(n_epochs):
             cost = 0
 
             for i in range(n_samples):
-                output = x[i]
+                output = X[i]
 
                 for layer in self.layers:
                     output = layer.forwardPropagation(output)
