@@ -40,8 +40,14 @@ all_data["Code"] = all_data["Code"].map(code_map)
 # Print the DataFrame
 print(all_data)
 
+# Apply sigmoid function to the 'Time' and 'Value' columns
+# split the data into training and testing sets
+# train the model
+# test the model
+
 
 """
+Deleted data entries:
 data-20: line 104 -> Code 4
 data-27: lines 806-811 -> WTF!?
 data-29: MANY WTFS!?
