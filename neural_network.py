@@ -8,6 +8,10 @@ class NeuronLayer:
 
     Attributes:
     ----------
+    input_size : int
+        Size of the input.
+    output_size : int
+        Size of the output.
     weights : numpy.ndarray
         Weights of the layer.
     bias : numpy.ndarray
@@ -19,20 +23,22 @@ class NeuronLayer:
     """
 
     def __init__(self, input_size: int, output_size: int) -> None:
-        """
-        Parameters:
-        ----------
-        input_size : int
-            Size of the input.
-        output_size : int
-            Size of the output.
-        """
+        self._input_size = input_size
+        self._output_size = output_size
 
         self._weights = np.random.randn(input_size, output_size)
         self._bias = np.random.randn(1, output_size)
 
         self._input = None
         self._output = None
+
+    @property
+    def input_size(self) -> int:
+        return self._input_size
+
+    @property
+    def output_size(self) -> int:
+        return self._output_size
 
     @property
     def weights(self) -> np.ndarray:
@@ -108,19 +114,12 @@ class NeuralNetwork:
     Attributes:
     ----------
     layers : list[NeuronLayer]
-        List of layers of the neural network.
-    errors : list[float]
-        List of the training errors.
+        List of layers in the neural network.
+    errors : np.ndarray
+        Training errors.
     """
 
     def __init__(self, layers: List[NeuronLayer]) -> None:
-        """
-        Parameters:
-        ----------
-        layers : list[NeuronLayer]
-            List of layers of the neural network.
-        """
-
         self._layers = layers
         self._errors = None
 
@@ -129,46 +128,46 @@ class NeuralNetwork:
         return self._layers
 
     @property
-    def errors(self) -> List[float]:
+    def errors(self) -> np.ndarray:
         return self._errors
 
-    def predict(self, input: np.ndarray) -> List[int]:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predicts the output for the given input data.
 
         Parameters:
         ----------
-        input : numpy.ndarray
+        X : numpy.ndarray
             Input data.
 
         Returns:
         -------
-        list[int]
-            List of the predicted values.
+        np.ndarray
+            Predicted outputs.
         """
 
-        samples = input.shape[0]
-        result = []
+        samples = X.shape[0]
+        result = np.zeros((samples, self.layers[-1].output_size))
 
         for i in range(samples):
-            output = input[i]
+            output = X[i]
 
             for layer in self.layers:
                 output = layer.forwardPropagation(output)
 
-            result.append(np.argmax(output) + 3)
+            result[i] = output
 
         return result
 
     def train(
-        self, x: np.ndarray, y: np.ndarray, n_epochs: int = 100, alfa=0.1
+        self, X: np.ndarray, y: np.ndarray, n_epochs: int = 100, alfa=0.1
     ) -> None:
         """
         Trains the neural network.
 
         Parameters:
         ----------
-        x : numpy.ndarray
+        X : numpy.ndarray
             Input data.
         y : numpy.ndarray
             Output data.
@@ -182,14 +181,14 @@ class NeuralNetwork:
         None
         """
 
-        n_samples = x.shape[0]
+        n_samples = X.shape[0]
         self._errors = np.zeros(n_epochs)
 
         for epoch in range(n_epochs):
             cost = 0
 
             for i in range(n_samples):
-                output = x[i]
+                output = X[i]
 
                 for layer in self.layers:
                     output = layer.forwardPropagation(output)
