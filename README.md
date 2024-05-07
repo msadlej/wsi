@@ -1,5 +1,5 @@
-# WSI_2023Z_NeuralNetwork
+# Neural Network
 
 ## Description
 
-This project is a neural network implementation.
+This project is a neural network implementation. It is used for a simple classification problem.
